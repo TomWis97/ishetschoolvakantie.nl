@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Is het schoolvakantie?</title>
+        <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}" />
+    </head>
+    <body>
+        <header>
+            <div id="links">
+                <a href="{{ url_for("static", filename="api.html" }}">[ api ]</a>
+                <a href="https://github.com/tomwis97/ishetschoolvakantie.nl">[ GitHub ]</a>
+            </div>
+            <h1>Is het schoolvakantie?</h1>
+        </header>
+        <main>
+            <div id="answer"><p>
+                {% if current_holiday | length == 0 %}Nee!
+                {% elif current_holiday[0]['name'] == "Adviesweek" %}Misschien!
+                {% else %}Ja! 🎉
+                {% endif %}
+                </p></div>
+            <div id="description">{{ description }}</p></div>
+            <div id="next_holiday">De volgende vakantie is de {{ next_holiday['name'] }}. Deze is voor de 
+                {% for region_key, region_value in next_holiday['regions'].items() %}
+                {% if not item.first and not item.last %}, voor de {% endif %}
+                {% if item.last %} en voor de {% endif %}
+                regio <span class="region">{{ region_key }}</span> van {{ region_value['start'].strftime('%-d %B %Y') }} tot en met {{ region_value['end'].strftime('%-d %B %Y') }}
+                {% endfor %}
+            </p></div>
+        </main>
+    </body>
+</html>

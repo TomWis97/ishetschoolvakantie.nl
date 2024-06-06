@@ -1,0 +1,72 @@
+---
+openapi: 3.0.3
+info:
+    title: IsHetSchoolvakantie.nl
+    description: Website informing about school holidays.
+    version: 1.0.0
+servers:
+  - url: https://ishetschoolvakantie.nl/api/v1
+paths:
+  /current:
+    get:
+      summary: Get current holiday(s).
+      description: Get current holiday(s). In case of the "adviesweek", there might be two holidays going on at the same time. That why this returns a list. But consuming the first item of the list is usually enough. When there's no holiyday, an empty list is returned.
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/holiday"
+  /next:
+    get:
+      summary: Get next upcoming holiday.
+      description: Gets information about the next coming holiday. Doesn't return current holiday, but the next one (obviously).
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/holiday"
+components:
+  schemas:
+    holiday:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Dutch name of holiday.
+          example: Zomervakantie
+        nationwide:
+          type: object
+          description: First and last date, nationwide.
+          properties:
+            start:
+              type: string
+              description: First day a region has holiday.
+              format: date
+              example: "2024-10-14"
+            end:
+              type: string
+              format: date
+              description: Last day a region has holiday.
+              example: "2024-10-29"
+        regions:
+          type: object
+          description: Regions and their respective dates. The key is the name of the region.
+          additionalProperties:
+            type: object
+            properties:
+              start:
+                type: string
+                description: First day of the holiday for the region.
+                format: date
+                example: "2024-10-14"
+              end:
+                type: string
+                format: date
+                description: Last day of the holiday for the region.
+                example: "2024-10-29"

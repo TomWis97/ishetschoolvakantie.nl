@@ -5,16 +5,17 @@ import json
 import re
 from bs4 import BeautifulSoup
 
+
 class HolidayParser:
     def __init__(self, url):
         self.url = url
         self.holidays = self.parse_webpage()
-        
+
     def parse_webpage(self):
         page = requests.get(self.url).text
         soup = BeautifulSoup(page, 'html.parser')
         table = soup.find_all('table')[0]
-        regions = [ x.text for x in table.find_all('th', scope='col') ]
+        regions = [x.text for x in table.find_all('th', scope='col')]
         self.regions = regions
         holidays = []
         for row in table.tbody.find_all('tr'):
@@ -25,9 +26,9 @@ class HolidayParser:
             latest_end = None
             for column in row.find_all('td'):
                 start, end = self.parse_column(column.text)
-                if earliest_start == None or start < earliest_start:
+                if earliest_start is None or start < earliest_start:
                     earliest_start = start
-                if latest_end == None or end > latest_end:
+                if latest_end is None or end > latest_end:
                     latest_end = end
                 region_dates[regions[index]] = {
                     'start': start,
@@ -55,8 +56,11 @@ class HolidayParser:
         return start_date, end_date
 
     def parse_adviceweek(self, soup):
-        advice_text = soup.find('h2', string="Adviesweek meivakantie").find_next_sibling('p').text
-        start, end = self.parse_column(re.search(r'(?<=adviesdata: ).*?(?=\.)', advice_text).group())
+        advice_text = soup.find(
+                'h2',
+                string="Adviesweek meivakantie").find_next_sibling('p').text
+        start, end = self.parse_column(
+                re.search(r'(?<=adviesdata: ).*?(?=\.)', advice_text).group())
         holiday_name = "Adviesweek meivakantie"
         regions = {}
         for region in self.regions:
@@ -69,10 +73,10 @@ class HolidayParser:
                 'start': start,
                 'end': end},
             'regions': regions}
-            
+
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
-    h = HolidayParser('https://www.rijksoverheid.nl/onderwerpen/schoolvakanties/overzicht-schoolvakanties-per-schooljaar/overzicht-schoolvakanties-2024-2025')
+    h = HolidayParser('https://www.rijksoverheid.nl/onderwerpen/schoolvakanties/overzicht-'
+                      'schoolvakanties-per-schooljaar/overzicht-schoolvakanties-2024-2025')
     print(h.holidays)
-
