@@ -1,0 +1,67 @@
+.roboto-regular {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.roboto-bold {
+  font-family: "Roboto", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.source-code-pro {
+  font-family: "Source Code Pro", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  text-align: center;
+  background-color: #111;
+  color: #F2F2F2;
+  padding: 0 10px;
+}
+
+header h1 {
+  font-weight: 700;
+  font-size: 3em;
+  margin: 1em 0;
+}
+
+footer {
+  font-family: "Source Code Pro", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+footer a {
+  text-decoration: none;
+  color: #00C1FF;
+}
+
+.region {
+  font-style: italic;
+}
+
+#answer p {
+  font-size: 3em;
+}
+
+#next_holiday {
+  margin: 2em 0;
+}
+
+#next_holiday h2 {
+  font-size: 1em;
+  margin: 0;
+}
+
+#next_holiday p {
+  margin: 0;
+}
