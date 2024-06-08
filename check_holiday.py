@@ -17,7 +17,7 @@ class HolidayChecker:
         current_holidays = []
         for holiday in self.holidays:
             if (holiday['nationwide']['start'] < now
-            and holiday['nationwide']['end'] > now):
+                    and holiday['nationwide']['end'] > now):
                 current_holidays.append(holiday)
         return current_holidays
 
@@ -36,10 +36,3 @@ class HolidayChecker:
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
-    holidays = HolidayParser(
-        'https://www.rijksoverheid.nl/onderwerpen/schoolvakanties/overzicht-'
-        'schoolvakanties-per-schooljaar/overzicht-schoolvakanties-2023-2024')
-    h = HolidayChecker(holidays.holidays)
-    print(h.current_holiday(now=datetime.datetime(day=16, month=10, year=2023)))
-    print(h.current_holiday())
-    print(h.next_holiday())

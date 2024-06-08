@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from werkzeug.middleware import ProxyFix
+#from werkzeug.middleware import ProxyFix
 import os
 import json
 import locale
@@ -11,18 +11,61 @@ from check_holiday import HolidayChecker
 app = Flask(__name__)
 locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
 
+
 @app.route('/')
 def serve_index():
     """
     Show main page.
     """
-    return render_template("index.html", 
-                           current_holiday=holiday.current_holiday(),
-                           next_holiday=holiday.next_holiday())
+    global h
+    return render_template("index.html",
+                           current_holiday=h.current_holiday(),
+                           next_holiday=h.next_holiday())
+
+
+def normalize_holiday(holiday):
+    """
+    Input a holiday formatted-object and convert datetime objects
+    to strings.
+    """
+    regions = {}
+    for region, dates in holiday['regions'].items():
+        regions[region] = {
+                'start': dates['start'].date().isoformat(),
+                'end': dates['end'].date().isoformat()}
+
+    return {'name': holiday['name'],
+            'nationwide': {
+                'start': holiday['nationwide']['start'].date().isoformat(),
+                'end': holiday['nationwide']['end'].date().isoformat()},
+            'regions': regions}
+
+
+@app.route('/api/v1/current')
+def serve_current():
+    current = h.current_holiday()
+    normalized_holidays = []
+    for holiday in current:
+        normalized_holidays.append(
+                normalize_holiday(holiday))
+    return normalized_holidays
+
+
+@app.route('/api/v1/next')
+def serve_next():
+    return normalize_holiday(h.next_holiday())
+
+
+@app.route('/api')
+def serve_api_docs():
+    return app.send_static_file('apidoc.html')
+
 
 def create_app():
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
+    setup_app()
+    #app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
     return app
+
 
 def setup_app():
     """
@@ -30,10 +73,9 @@ def setup_app():
     """
     source = os.getenv('DATA_URL')
     if not source:
-        source = 'https://www.rijksoverheid.nl/onderwerpen/schoolvakanties/overzicht-'
-                 'schoolvakanties-per-schooljaar/overzicht-schoolvakanties-2023-2024')
-    holidays = HolidayChecker(HolidayParser(source))
-    global holidays
+        source = None
+    global h
+    h = HolidayChecker(HolidayParser(source).holidays)
 
-if __name__ == "__main__":
-    setup_app()
+
+setup_app()

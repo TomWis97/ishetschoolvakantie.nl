@@ -7,18 +7,47 @@ from bs4 import BeautifulSoup
 
 
 class HolidayParser:
-    def __init__(self, url):
-        self.url = url
-        self.holidays = self.parse_webpage()
+    def __init__(self, url=None) -> None:
+        """
+        Set-up Holiday parser object. It checks which information is available,
+        dynamically generates a list of available URL's and processes those
+        pages with parse_webpage().
+        """
+        if url is None:
+            # Dynamically generate list of available URLs.
+            urls = []
+            for year in range(
+                    datetime.datetime.now().year - 1,
+                    datetime.datetime.now().year + 5):
+                url_base = ('https://www.rijksoverheid.nl/onderwerpen/school'
+                            'vakanties/overzicht-schoolvakanties-per-'
+                            'schooljaar/overzicht-schoolvakanties-{}-{}')
+                testing_year = url_base.format(year, year + 1)
+                # Fetch headers; if HTTP status code is 200, page is available
+                if requests.head(testing_year).status_code == 200:
+                    urls.append(testing_year)
+            self.urls = urls
+        else:
+            self.urls = [url]
 
-    def parse_webpage(self):
-        page = requests.get(self.url).text
+        holidays = []
+        for url in self.urls:
+            holidays = holidays + self.parse_webpage(url)
+        self.holidays = holidays
+
+    def parse_webpage(self, url) -> dict:
+        """
+        Parses a webpage containing the dates with BeautifulSoup. Returns a
+        list containing the holidays and dates discovered on webpage.
+        """
+        page = requests.get(url).text
         soup = BeautifulSoup(page, 'html.parser')
         table = soup.find_all('table')[0]
         regions = [x.text for x in table.find_all('th', scope='col')]
         self.regions = regions
         holidays = []
         for row in table.tbody.find_all('tr'):
+            # Each row contains a holiday.
             holiday_name = row.th.p.text
             index = 0
             region_dates = {}
@@ -44,8 +73,11 @@ class HolidayParser:
         holidays.append(advice)
         return holidays
 
-    def parse_column(self, text):
-        start_string, end_string = text.split(' t/m ')
+    def parse_column(self, text) -> tuple:
+        """
+        Each column contains information about that specific region.
+        """
+        start_string, end_string = [x.strip() for x in text.split(' t/m ')]
         end_date = datetime.datetime.strptime(end_string, '%d %B %Y')
         if len(start_string.split(' ')) < 3:
             start_date = datetime.datetime.strptime(
@@ -55,7 +87,11 @@ class HolidayParser:
             start_date = datetime.datetime.strptime(start_string, '%d %B %Y')
         return start_date, end_date
 
-    def parse_adviceweek(self, soup):
+    def parse_adviceweek(self, soup) -> dict:
+        """
+        Information about the "adviesweek" is written in text. So we need to
+        interpret that text.
+        """
         advice_text = soup.find(
                 'h2',
                 string="Adviesweek meivakantie").find_next_sibling('p').text
@@ -77,6 +113,3 @@ class HolidayParser:
 
 if __name__ == "__main__":
     locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
-    h = HolidayParser('https://www.rijksoverheid.nl/onderwerpen/schoolvakanties/overzicht-'
-                      'schoolvakanties-per-schooljaar/overzicht-schoolvakanties-2024-2025')
-    print(h.holidays)
