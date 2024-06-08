@@ -2,7 +2,13 @@
 <html>
     <head>
         <title>Is het schoolvakantie?</title>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏖️</text></svg>">
         <link rel="stylesheet" type="text/css" href="{{ url_for("static", filename="style.css") }}" />
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet">
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta charset="UTF-8" />
     </head>
     <body>
         <header>
@@ -10,14 +16,14 @@
         </header>
         <main>
             <div id="answer"><p>
-                {% if current_holiday | length == 0 %}Nee!
-                {% elif current_holiday[0]['name'] == "Adviesweek meivakantie" %}Misschien!
+                {% if current_holiday | length == 0 %}Nee! 😞
+                {% elif current_holiday[0]['name'] == "Adviesweek meivakantie" %}Misschien! 🤔
                 {% else %}Ja! 🎉
                 {% endif %}
                 </p></div>
             {% if current_holiday | length > 0 %}
             <div id="description">
-                <p>Het is nu {{ current_holiday['name'] }}.
+                <p>Het is nu {{ current_holiday[0]['name'] | lower }}.
                 {% if current_holiday[0]['name'] == "Adviesweek meivakantie" %}
                 Dit is een week waarin de scholen zelf de keuze hebben of ze vrij geven.
                 {% endif %}
@@ -28,7 +34,9 @@
                 </p>
             </div>
             {% endif %}
-            <div id="next_holiday"><p>De volgende vakantie is de {{ next_holiday['name'] }}. Deze is voor de 
+            <div id="next_holiday">
+                <h2>Volgende vakantie</h2>
+                <p>De volgende vakantie is de {{ next_holiday['name'] | lower }}. Deze is voor de 
                 {% for region_key, region_value in next_holiday['regions'].items() %}
                 {% if not loop.first and not loop.last %}, voor de {% endif %}
                 {% if loop.last %} en voor de {% endif %}
