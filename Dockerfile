@@ -17,3 +17,4 @@ USER python
 COPY . /app
 RUN pip3 install -r requirements.txt
 CMD /app/.local/bin/gunicorn -w 6 -b :8000 'app:create_app()'
+EXPOSE 8000
