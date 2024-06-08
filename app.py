@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-#from werkzeug.middleware import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 import json
 import locale
@@ -17,10 +17,14 @@ def serve_index():
     """
     Show main page.
     """
-    global h
-    return render_template("index.html",
-                           current_holiday=h.current_holiday(),
-                           next_holiday=h.next_holiday())
+    if force_date:
+        return render_template("index.html",
+                               current_holiday=h.current_holiday(force_date),
+                               next_holiday=h.next_holiday(force_date))
+    else:
+        return render_template("index.html",
+                               current_holiday=h.current_holiday(),
+                               next_holiday=h.next_holiday())
 
 
 def normalize_holiday(holiday):
@@ -43,7 +47,10 @@ def normalize_holiday(holiday):
 
 @app.route('/api/v1/current')
 def serve_current():
-    current = h.current_holiday()
+    if force_date:
+        current = h.current_holiday(force_date)
+    else:
+        current = h.current_holiday()
     normalized_holidays = []
     for holiday in current:
         normalized_holidays.append(
@@ -53,7 +60,10 @@ def serve_current():
 
 @app.route('/api/v1/next')
 def serve_next():
-    return normalize_holiday(h.next_holiday())
+    if force_date:
+        return normalize_holiday(h.next_holiday(force_date))
+    else:
+        return normalize_holiday(h.next_holiday())
 
 
 @app.route('/api')
@@ -63,9 +73,9 @@ def serve_api_docs():
 
 def create_app():
     setup_app()
-    #app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
+    if os.getenv('BEHIND_REVERSE_PROXY'):
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
     return app
-
 
 def setup_app():
     """
@@ -74,6 +84,15 @@ def setup_app():
     source = os.getenv('DATA_URL')
     if not source:
         source = None
+
+    # Force a date to be displayed (for debugging).
+    global force_date
+    force_date_value = os.getenv('FORCE_DATE')
+    if force_date_value:
+        force_date = datetime.datetime.fromisoformat(force_date_value)
+    else:
+        force_date = None
+
     global h
     h = HolidayChecker(HolidayParser(source).holidays)
 
