@@ -28,7 +28,7 @@
                 Dit is een week waarin de scholen zelf de keuze hebben of ze vrij geven.
                 {% endif %}
                 Deze is voor de 
-                {% for region_key, region_value in next_holiday['regions'].items() %}{% if not loop.first and not loop.last %}, voor de {% endif %}
+                {% for region_key, region_value in current_holiday[0]['regions'].items() %}{% if not loop.first and not loop.last %}, voor de {% endif %}
                 {% if loop.last %} en voor de {% endif %}
                 <span class="region">{{ region_key | lower }}</span> van {{ region_value['start'].strftime('%-d %B %Y') }} tot en met {{ region_value['end'].strftime('%-d %B %Y') }}{% endfor %}
                 </p>

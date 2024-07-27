@@ -12,7 +12,7 @@ class HolidayChecker:
             now: datetime.datetime = datetime.datetime.now()) -> list:
         """
         Returns a list of current holidays. (Usually zero or
-        one items. But can be 2 in case of "adviesweek".
+        one items. But can be 2 in case of "adviesweek".)
         """
         current_holidays = []
         for holiday in self.holidays:
