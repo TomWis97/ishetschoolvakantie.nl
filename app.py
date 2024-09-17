@@ -11,6 +11,14 @@ from check_holiday import HolidayChecker
 app = Flask(__name__)
 locale.setlocale(locale.LC_TIME, ('nl', 'UTF-8'))
 
+class HolidayExtension:
+    def __init__(self, source, app=None):
+        self.h = HolidayChecker(HolidayParser(source).holidays)
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        app.extensions['holiday_instance'] = self.h
 
 @app.route('/')
 def serve_index():
@@ -19,12 +27,12 @@ def serve_index():
     """
     if force_date:
         return render_template("index.html",
-                               current_holiday=app.h.current_holiday(force_date),
-                               next_holiday=app.h.next_holiday(force_date))
+                               current_holiday=app.extensions['holiday_instance'].current_holiday(force_date),
+                               next_holiday=app.extensions['holiday_instance'].next_holiday(force_date))
     else:
         return render_template("index.html",
-                               current_holiday=app.h.current_holiday(),
-                               next_holiday=app.h.next_holiday())
+                               current_holiday=app.extensions['holiday_instance'].current_holiday(),
+                               next_holiday=app.extensions['holiday_instance'].next_holiday())
 
 
 def normalize_holiday(holiday):
@@ -48,9 +56,9 @@ def normalize_holiday(holiday):
 @app.route('/api/v1/current')
 def serve_current():
     if force_date:
-        current = app.h.current_holiday(force_date)
+        current = app.extensions['holiday_instance'].current_holiday(force_date)
     else:
-        current = app.h.current_holiday()
+        current = app.extensions['holiday_instance'].current_holiday()
     normalized_holidays = []
     for holiday in current:
         normalized_holidays.append(
@@ -61,9 +69,9 @@ def serve_current():
 @app.route('/api/v1/next')
 def serve_next():
     if force_date:
-        return normalize_holiday(app.h.next_holiday(force_date))
+        return normalize_holiday(app.extensions['holiday_instance'].next_holiday(force_date))
     else:
-        return normalize_holiday(app.h.next_holiday())
+        return normalize_holiday(app.extensions['holiday_instance'].next_holiday())
 
 
 @app.route('/api')
@@ -93,7 +101,7 @@ def setup_app(app):
     else:
         force_date = None
 
-    app.h = HolidayChecker(HolidayParser(source).holidays)
+    holiday_extension = HolidayExtension(source, app)
 
 
 create_app()
