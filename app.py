@@ -19,12 +19,12 @@ def serve_index():
     """
     if force_date:
         return render_template("index.html",
-                               current_holiday=h.current_holiday(force_date),
-                               next_holiday=h.next_holiday(force_date))
+                               current_holiday=app.h.current_holiday(force_date),
+                               next_holiday=app.h.next_holiday(force_date))
     else:
         return render_template("index.html",
-                               current_holiday=h.current_holiday(),
-                               next_holiday=h.next_holiday())
+                               current_holiday=app.h.current_holiday(),
+                               next_holiday=app.h.next_holiday())
 
 
 def normalize_holiday(holiday):
@@ -48,9 +48,9 @@ def normalize_holiday(holiday):
 @app.route('/api/v1/current')
 def serve_current():
     if force_date:
-        current = h.current_holiday(force_date)
+        current = app.h.current_holiday(force_date)
     else:
-        current = h.current_holiday()
+        current = app.h.current_holiday()
     normalized_holidays = []
     for holiday in current:
         normalized_holidays.append(
@@ -61,9 +61,9 @@ def serve_current():
 @app.route('/api/v1/next')
 def serve_next():
     if force_date:
-        return normalize_holiday(h.next_holiday(force_date))
+        return normalize_holiday(app.h.next_holiday(force_date))
     else:
-        return normalize_holiday(h.next_holiday())
+        return normalize_holiday(app.h.next_holiday())
 
 
 @app.route('/api')
@@ -72,12 +72,12 @@ def serve_api_docs():
 
 
 def create_app():
-    setup_app()
+    setup_app(app)
     if os.getenv('BEHIND_REVERSE_PROXY'):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_host=1)
     return app
 
-def setup_app():
+def setup_app(app):
     """
     Fetches and interprets source information.
     """
@@ -93,8 +93,7 @@ def setup_app():
     else:
         force_date = None
 
-    global h
-    h = HolidayChecker(HolidayParser(source).holidays)
+    app.h = HolidayChecker(HolidayParser(source).holidays)
 
 
-setup_app()
+create_app()
