@@ -25,10 +25,10 @@ def serve_index():
     """
     Show main page.
     """
-    if force_date:
+    if app.config['force_date']:
         return render_template("index.html",
-                               current_holiday=app.extensions['holiday_instance'].current_holiday(force_date),
-                               next_holiday=app.extensions['holiday_instance'].next_holiday(force_date))
+                               current_holiday=app.extensions['holiday_instance'].current_holiday(app.config['force_date']),
+                               next_holiday=app.extensions['holiday_instance'].next_holiday(app.config['force_date']))
     else:
         return render_template("index.html",
                                current_holiday=app.extensions['holiday_instance'].current_holiday(),
@@ -94,12 +94,12 @@ def setup_app(app):
         source = None
 
     # Force a date to be displayed (for debugging).
-    global force_date
     force_date_value = os.getenv('FORCE_DATE')
     if force_date_value:
         force_date = datetime.datetime.fromisoformat(force_date_value)
     else:
         force_date = None
+    app.config['force_date'] = force_date
 
     holiday_extension = HolidayExtension(source, app)
 
