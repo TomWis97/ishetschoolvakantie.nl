@@ -40,7 +40,9 @@ class HolidayParser:
         Parses a webpage containing the dates with BeautifulSoup. Returns a
         list containing the holidays and dates discovered on webpage.
         """
-        page = requests.get(url).text
+        r = requests.get(url)
+        print("Requested webpage {} with status code {}".format(url, r.status_code))
+        page = r.text
         soup = BeautifulSoup(page, 'html.parser')
         table = soup.find_all('table')[0]
         regions = [x.text for x in table.find_all('th', scope='col')]
