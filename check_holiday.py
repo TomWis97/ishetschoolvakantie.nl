@@ -9,11 +9,13 @@ class HolidayChecker:
 
     def current_holiday(
             self,
-            now: datetime.datetime = datetime.datetime.now()) -> list:
+            now: datetime.datetime | None = None) -> list:
         """
         Returns a list of current holidays. (Usually zero or
         one items. But can be 2 in case of "adviesweek".)
         """
+        if now == None:
+            now = datetime.datetime.now()
         current_holidays = []
         for holiday in self.holidays:
             if (holiday['nationwide']['start'] < now
@@ -23,10 +25,12 @@ class HolidayChecker:
 
     def next_holiday(
             self,
-            now: datetime.datetime = datetime.datetime.now()) -> dict:
+            now: datetime.datetime | None = None) -> dict:
         """
         Returns a dictionary containing information about the next holiday.
         """
+        if now == None:
+            now = datetime.datetime.now()
         sorted_holidays = sorted(
                 self.holidays, key=lambda d: d['nationwide']['start'])
         for holiday in sorted_holidays:
