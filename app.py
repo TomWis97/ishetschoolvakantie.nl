@@ -55,8 +55,8 @@ def normalize_holiday(holiday):
 
 @app.route('/api/v1/current')
 def serve_current():
-    if force_date:
-        current = app.extensions['holiday_instance'].current_holiday(force_date)
+    if app.config['force_date']:
+        current = app.extensions['holiday_instance'].current_holiday(app.config['force_date'])
     else:
         current = app.extensions['holiday_instance'].current_holiday()
     normalized_holidays = []
@@ -68,8 +68,8 @@ def serve_current():
 
 @app.route('/api/v1/next')
 def serve_next():
-    if force_date:
-        return normalize_holiday(app.extensions['holiday_instance'].next_holiday(force_date))
+    if app.config['force_date']:
+        return normalize_holiday(app.extensions['holiday_instance'].next_holiday(app.config['force_date']))
     else:
         return normalize_holiday(app.extensions['holiday_instance'].next_holiday())
 
