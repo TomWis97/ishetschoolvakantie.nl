@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.13
 WORKDIR /app
 ENV FORCE_DATE=""
 ENV DATA_URL=""
