@@ -19,8 +19,8 @@ class HolidayParser:
             for year in range(
                     datetime.datetime.now().year - 1,
                     datetime.datetime.now().year + 5):
-                url_base = ('https://www.rijksoverheid.nl/onderwerpen/school'
-                            'vakanties/overzicht-schoolvakanties-per-'
+                url_base = ('https://www.rijksoverheid.nl/themas/onderwijs/'
+                            'schoolvakanties/overzicht-schoolvakanties-per-'
                             'schooljaar/overzicht-schoolvakanties-{}-{}')
                 testing_year = url_base.format(year, year + 1)
                 # Fetch headers; if HTTP status code is 200, page is available
