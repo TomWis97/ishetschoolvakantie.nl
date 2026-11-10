@@ -10,7 +10,7 @@ itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
 packaging==26.3
-requests==2.33.1
+requests==2.34.2
 soupsieve==3.0.3
 urllib3==2.8.0
 Werkzeug==3.1.9
